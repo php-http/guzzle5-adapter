@@ -21,7 +21,7 @@ matrix:
 install:
   - travis_retry composer self-update
   - travis_retry composer update ${COMPOSER_FLAGS} --prefer-source --no-interaction
-  - php -S 127.0.0.1:10000 -t vendor/php-http/adapter-integration-tests/fixture
+  - php -S 127.0.0.1:10000 -t vendor/php-http/adapter-integration-tests/fixture > /dev/null 2>&1 &
 
 script: vendor/bin/phpunit ${PHPUNIT_FLAGS}
 
