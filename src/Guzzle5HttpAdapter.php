@@ -58,7 +58,6 @@ class Guzzle5HttpAdapter extends CurlHttpAdapter
         try {
             $response = $this->client->send($this->createRequest($internalRequest));
         } catch (\Exception $e) {
-            var_dump($e); exit;
             throw HttpAdapterException::cannotFetchUri(
                 $e->getRequest()->getUrl(),
                 $this->getName(),

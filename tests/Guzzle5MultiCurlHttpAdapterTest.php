@@ -16,10 +16,10 @@ use GuzzleHttp\Ring\Client\CurlMultiHandler;
 /**
  * @author GeLo <geloen.eric@gmail.com>
  */
-class Guzzle5MultiHttpAdapterTest extends Guzzle5HttpAdapterTest
+class Guzzle5MultiCurlHttpAdapterTest extends Guzzle5HttpAdapterTest
 {
     /**
-     * Returns a handler for the client
+     * {@inheritdoc}
      */
     protected function createHandler()
     {

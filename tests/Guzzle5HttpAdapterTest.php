@@ -12,13 +12,12 @@
 namespace Http\Adapter\Tests;
 
 use GuzzleHttp\Client;
-use GuzzleHttp\Ring\Client\CurlHandler;
 use Http\Adapter\Guzzle5HttpAdapter;
 
 /**
  * @author GeLo <geloen.eric@gmail.com>
  */
-class Guzzle5HttpAdapterTest extends HttpAdapterTest
+abstract class Guzzle5HttpAdapterTest extends HttpAdapterTest
 {
     public function testGetName()
     {
@@ -35,9 +34,8 @@ class Guzzle5HttpAdapterTest extends HttpAdapterTest
 
     /**
      * Returns a handler for the client
+     *
+     * @return object
      */
-    protected function createHandler()
-    {
-        return new CurlHandler();
-    }
+    abstract protected function createHandler();
 }
