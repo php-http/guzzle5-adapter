@@ -14,7 +14,7 @@
         "php": ">=5.4",
         "ext-curl": "*",
         "php-http/adapter-core": "dev-initial_import",
-        "guzzlehttp/guzzle": "~5.0",
+        "guzzlehttp/guzzle": "^5.0.1",
         "guzzlehttp/ringphp": "^1.0.8@dev"
     },
     "require-dev": {
