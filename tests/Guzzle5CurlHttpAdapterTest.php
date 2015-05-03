@@ -21,6 +21,18 @@ class Guzzle5CurlHttpAdapterTest extends Guzzle5HttpAdapterTest
     /**
      * {@inheritdoc}
      */
+    protected function setUp()
+    {
+        if (PHP_VERSION_ID < 50500) {
+            $this->markTestSkipped();
+        }
+
+        parent::setUp();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     protected function createHandler()
     {
         return new CurlHandler();
