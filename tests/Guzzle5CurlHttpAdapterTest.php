@@ -14,22 +14,12 @@ namespace Http\Adapter\Tests;
 use GuzzleHttp\Ring\Client\CurlHandler;
 
 /**
+ * @requires PHP 5.5
+ *
  * @author GeLo <geloen.eric@gmail.com>
  */
 class Guzzle5CurlHttpAdapterTest extends Guzzle5HttpAdapterTest
 {
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
-    {
-        if (PHP_VERSION_ID < 50500) {
-            $this->markTestSkipped();
-        }
-
-        parent::setUp();
-    }
-
     /**
      * {@inheritdoc}
      */
