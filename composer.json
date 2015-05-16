@@ -12,12 +12,12 @@
     ],
     "require": {
         "php": ">=5.4",
-        "ext-curl": "*",
         "php-http/adapter-core": "0.1.*@dev",
         "guzzlehttp/guzzle": "~5.1",
         "guzzlehttp/ringphp": "^1.0.8@dev"
     },
     "require-dev": {
+        "ext-curl": "*",
         "php-http/adapter-integration-tests": "0.1.*@dev"
     },
     "provide": {
