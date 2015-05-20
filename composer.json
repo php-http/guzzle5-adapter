@@ -12,13 +12,13 @@
     ],
     "require": {
         "php": ">=5.4",
-        "php-http/adapter-core": "0.1.*@dev",
+        "php-http/adapter-core": "dev-internal_separation",
         "guzzlehttp/guzzle": "~5.1",
         "guzzlehttp/ringphp": "^1.0.8@dev"
     },
     "require-dev": {
         "ext-curl": "*",
-        "php-http/adapter-integration-tests": "0.1.*@dev"
+        "php-http/adapter-integration-tests": "dev-internal_separation"
     },
     "provide": {
         "php-http/adapter-implementation": "0.1"

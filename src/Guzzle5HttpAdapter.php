@@ -18,13 +18,15 @@ use GuzzleHttp\Event\ErrorEvent;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Message\RequestInterface;
 use GuzzleHttp\Pool;
-use Http\Adapter\Message\InternalRequestInterface;
+use Http\Adapter\Common\Exception\CannotFetchUri;
+use Http\Adapter\Internal\Message\InternalRequest;
+use Http\Adapter\Internal\Message\MessageFactory;
 use Http\Adapter\Normalizer\BodyNormalizer;
 
 /**
  * @author GeLo <geloen.eric@gmail.com>
  */
-class Guzzle5HttpAdapter extends CurlHttpAdapter
+class Guzzle5HttpAdapter extends Core\CurlHttpAdapter
 {
     /**
      * @var ClientInterface
@@ -33,12 +35,13 @@ class Guzzle5HttpAdapter extends CurlHttpAdapter
 
     /**
      *
-     * @param ClientInterface|null        $client
-     * @param ConfigurationInterface|null $configuration
+     * @param ClientInterface|null $client
+     * @param array                $options
+     * @param MessageFactory|null  $messageFactory
      */
-    public function __construct(ClientInterface $client = null, ConfigurationInterface $configuration = null)
+    public function __construct(ClientInterface $client = null, array $options = [], MessageFactory $messageFactory = null)
     {
-        parent::__construct($configuration);
+        parent::__construct($options, $messageFactory);
 
         $this->client = $client ?: new Client();
     }
@@ -54,20 +57,17 @@ class Guzzle5HttpAdapter extends CurlHttpAdapter
     /**
      * {@inheritdoc}
      */
-    protected function sendInternalRequest(InternalRequestInterface $internalRequest)
+    protected function sendInternalRequest(InternalRequest $internalRequest)
     {
         try {
             $response = $this->client->send($this->createRequest($internalRequest));
         } catch (RequestException $e) {
-            throw HttpAdapterException::cannotFetchUri(
-                $e->getRequest()->getUrl(),
-                $this->getName(),
-                $e->getMessage()
-            );
+            throw new CannotFetchUri($e->getRequest()->getUrl(), $this->getName(), $e);
         }
 
-        return $this->getConfiguration()->getMessageFactory()->createResponse(
+        return $this->getMessageFactory()->createResponse(
             (integer) $response->getStatusCode(),
+            null,
             $response->getProtocolVersion(),
             $response->getHeaders(),
             BodyNormalizer::normalize(
@@ -82,7 +82,7 @@ class Guzzle5HttpAdapter extends CurlHttpAdapter
     /**
      * {@inheritdoc}
      */
-    protected function sendInternalRequests(array $internalRequests, $success, $error)
+    protected function sendInternalRequests(array $internalRequests, callable $success, callable $error)
     {
         $requests = [];
         foreach ($internalRequests as $internalRequest) {
@@ -101,15 +101,15 @@ class Guzzle5HttpAdapter extends CurlHttpAdapter
     }
 
     /**
-     * Creates a request.
+     * Creates a request
      *
-     * @param InternalRequestInterface $internalRequest
-     * @param callable|null            $success
-     * @param callable|null            $error
+     * @param InternalRequest $internalRequest
+     * @param callable|null   $success
+     * @param callable|null   $error
      *
      * @return RequestInterface
      */
-    private function createRequest(InternalRequestInterface $internalRequest, callable $success = null, callable $error = null)
+    private function createRequest(InternalRequest $internalRequest, callable $success = null, callable $error = null)
     {
         $request = $this->client->createRequest(
             $internalRequest->getMethod(),
@@ -117,8 +117,8 @@ class Guzzle5HttpAdapter extends CurlHttpAdapter
             [
                 'exceptions'      => false,
                 'allow_redirects' => false,
-                'timeout'         => $this->getConfiguration()->getTimeout(),
-                'connect_timeout' => $this->getConfiguration()->getTimeout(),
+                'timeout'         => $this->getContextOption('timeout', $internalRequest),
+                'connect_timeout' => $this->getContextOption('timeout', $internalRequest),
                 'version'         => $internalRequest->getProtocolVersion(),
                 'headers'         => $this->prepareHeaders($internalRequest),
                 'body'            => $this->prepareContent($internalRequest),
@@ -126,13 +126,14 @@ class Guzzle5HttpAdapter extends CurlHttpAdapter
         );
 
         if (isset($success)) {
-            $messageFactory = $this->getConfiguration()->getMessageFactory();
+            $messageFactory = $this->getMessageFactory();
 
             $request->getEmitter()->on(
                 'complete',
                 function (CompleteEvent $event) use ($success, $internalRequest, $messageFactory) {
                     $response = $messageFactory->createResponse(
                         (integer) $event->getResponse()->getStatusCode(),
+                        null,
                         $event->getResponse()->getProtocolVersion(),
                         $event->getResponse()->getHeaders(),
                         BodyNormalizer::normalize(
@@ -143,6 +144,7 @@ class Guzzle5HttpAdapter extends CurlHttpAdapter
                         )
                     );
 
+                    $response = new Core\Message\ParameterableResponse($response);
                     $response = $response->withParameter('request', $internalRequest);
                     call_user_func($success, $response);
                 }
@@ -155,10 +157,10 @@ class Guzzle5HttpAdapter extends CurlHttpAdapter
             $request->getEmitter()->on(
                 'error',
                 function (ErrorEvent $event) use ($error, $internalRequest, $httpAdapterName) {
-                    $exception = HttpAdapterException::cannotFetchUri(
+                    $exception = new CannotFetchUri(
                         $event->getException()->getRequest()->getUrl(),
                         $httpAdapterName,
-                        $event->getException()->getMessage()
+                        $event->getException()
                     );
                     $exception->setRequest($internalRequest);
                     call_user_func($error, $exception);
