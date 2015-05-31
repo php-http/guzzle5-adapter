@@ -13,21 +13,26 @@ namespace Http\Adapter;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
-use GuzzleHttp\Event\CompleteEvent;
-use GuzzleHttp\Event\ErrorEvent;
 use GuzzleHttp\Exception\RequestException;
-use GuzzleHttp\Message\RequestInterface;
+use GuzzleHttp\Message\RequestInterface as GuzzleRequest;
+use GuzzleHttp\Message\ResponseInterface as GuzzleResponse;
 use GuzzleHttp\Pool;
-use Http\Adapter\Common\Exception\CannotFetchUri;
-use Http\Adapter\Internal\Message\InternalRequest;
-use Http\Adapter\Internal\Message\MessageFactory;
-use Http\Adapter\Normalizer\BodyNormalizer;
+use Http\Adapter\Common\Exception\HttpAdapterException;
+use Http\Adapter\Common\Exception\MultiHttpAdapterException;
+use Http\Common\Message\MessageFactoryGuesser;
+use Http\Message\MessageFactory;
+use Http\Message\MessageFactoryAware;
+use Http\Message\MessageFactoryAwareTemplate;
+use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\ResponseInterface;
 
 /**
  * @author GeLo <geloen.eric@gmail.com>
  */
-class Guzzle5HttpAdapter extends Core\CurlHttpAdapter
+class Guzzle5HttpAdapter implements HttpAdapter, MessageFactoryAware
 {
+    use MessageFactoryAwareTemplate;
+
     /**
      * @var ClientInterface
      */
@@ -36,14 +41,63 @@ class Guzzle5HttpAdapter extends Core\CurlHttpAdapter
     /**
      *
      * @param ClientInterface|null $client
-     * @param array                $options
      * @param MessageFactory|null  $messageFactory
      */
-    public function __construct(ClientInterface $client = null, array $options = [], MessageFactory $messageFactory = null)
+    public function __construct(ClientInterface $client = null, MessageFactory $messageFactory = null)
     {
-        parent::__construct($options, $messageFactory);
-
         $this->client = $client ?: new Client();
+        $this->messageFactory = $messageFactory ?: MessageFactoryGuesser::guess();
+
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function sendRequest(RequestInterface $request, array $options = [])
+    {
+        $guzzleRequest = $this->createRequest($request, $options);
+
+        try {
+            $response = $this->client->send($guzzleRequest);
+        } catch (RequestException $e) {
+            throw $this->createException($e, $request);
+        }
+
+        return $this->createResponse($response);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function sendRequests(array $requests, array $options = [])
+    {
+        $requests = array_values($requests);
+        $guzzleRequests = [];
+
+        foreach ($requests as $request) {
+            $guzzleRequests[] = $this->createRequest($request, $options);
+        }
+
+        $results = Pool::batch($this->client, $guzzleRequests);
+
+        $exceptions = [];
+        $responses = [];
+
+        foreach ($guzzleRequests as $key => $guzzleRequest) {
+            $result = $results->getResult($guzzleRequest);
+
+            if ($result instanceof GuzzleResponse) {
+                $responses[] = $this->createResponse($result);
+            } elseif ($result instanceof RequestException) {
+                $exceptions[] = $this->createException($result, $requests[$key]);
+            }
+        }
+
+        if (count($exceptions) > 0) {
+            throw new MultiHttpAdapterException($exceptions, $responses);
+        }
+
+        return $responses;
     }
 
     /**
@@ -55,119 +109,95 @@ class Guzzle5HttpAdapter extends Core\CurlHttpAdapter
     }
 
     /**
-     * {@inheritdoc}
+     * Converts a PSR request into a Guzzle request
+     *
+     * @param RequestInterface $request
+     *
+     * @return GuzzleRequest
      */
-    protected function sendInternalRequest(InternalRequest $internalRequest)
+    private function createRequest(RequestInterface $request, array $options = [])
     {
-        try {
-            $response = $this->client->send($this->createRequest($internalRequest));
-        } catch (RequestException $e) {
-            throw new CannotFetchUri($e->getRequest()->getUrl(), $this->getName(), $e);
-        }
+        $options = $this->buildOptions($options);
+
+        $options['version'] = $request->getProtocolVersion();
+        $options['headers'] = $request->getHeaders();
+        $options['body']    = (string) $request->getBody();
+
+        return $this->client->createRequest(
+            $request->getMethod(),
+            (string) $request->getUri(),
+            $options
+        );
+    }
+
+    /**
+     * Converts a Guzzle response into a PSR response
+     *
+     * @param GuzzleResponse $response
+     *
+     * @return ResponseInterface
+     */
+    private function createResponse(GuzzleResponse $response)
+    {
+        $body = $response->getBody();
 
         return $this->getMessageFactory()->createResponse(
-            (integer) $response->getStatusCode(),
+            $response->getStatusCode(),
             null,
             $response->getProtocolVersion(),
             $response->getHeaders(),
-            BodyNormalizer::normalize(
-                function () use ($response) {
-                    return $response->getBody()->detach();
-                },
-                $internalRequest->getMethod()
-            )
+            isset($body) ? $body->detach() : null
         );
     }
 
     /**
-     * {@inheritdoc}
-     */
-    protected function sendInternalRequests(array $internalRequests, callable $success, callable $error)
-    {
-        $requests = [];
-        foreach ($internalRequests as $internalRequest) {
-            $requests[] = $this->createRequest($internalRequest, $success, $error);
-        }
-
-        Pool::batch($this->client, $requests);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function createFile($file)
-    {
-        return fopen($file, 'r');
-    }
-
-    /**
-     * Creates a request
+     * Converts a Guzzle exception into an HttpAdapter exception
      *
-     * @param InternalRequest $internalRequest
-     * @param callable|null   $success
-     * @param callable|null   $error
+     * @param RequestException $exception
      *
-     * @return RequestInterface
+     * @return HttpAdapterException
      */
-    private function createRequest(InternalRequest $internalRequest, callable $success = null, callable $error = null)
-    {
-        $request = $this->client->createRequest(
-            $internalRequest->getMethod(),
-            (string) $internalRequest->getUri(),
-            [
-                'exceptions'      => false,
-                'allow_redirects' => false,
-                'timeout'         => $this->getContextOption('timeout', $internalRequest),
-                'connect_timeout' => $this->getContextOption('timeout', $internalRequest),
-                'version'         => $internalRequest->getProtocolVersion(),
-                'headers'         => $this->prepareHeaders($internalRequest),
-                'body'            => $this->prepareContent($internalRequest),
-            ]
+    private function createException(
+        RequestException $exception,
+        RequestInterface $originalRequest
+    ) {
+        $adapterException = new HttpAdapterException(
+            $exception->getMessage(),
+            0,
+            $exception
         );
 
-        if (isset($success)) {
-            $messageFactory = $this->getMessageFactory();
+        $response = null;
 
-            $request->getEmitter()->on(
-                'complete',
-                function (CompleteEvent $event) use ($success, $internalRequest, $messageFactory) {
-                    $response = $messageFactory->createResponse(
-                        (integer) $event->getResponse()->getStatusCode(),
-                        null,
-                        $event->getResponse()->getProtocolVersion(),
-                        $event->getResponse()->getHeaders(),
-                        BodyNormalizer::normalize(
-                            function () use ($event) {
-                                return $event->getResponse()->getBody()->detach();
-                            },
-                            $internalRequest->getMethod()
-                        )
-                    );
-
-                    $response = new Core\Message\ParameterableResponse($response);
-                    $response = $response->withParameter('request', $internalRequest);
-                    call_user_func($success, $response);
-                }
-            );
+        if ($exception->hasResponse()) {
+            $response = $this->createResponse($exception->getResponse());
         }
 
-        if (isset($error)) {
-            $httpAdapterName = $this->getName();
+        $adapterException->setResponse($response);
+        $adapterException->setRequest($originalRequest);
 
-            $request->getEmitter()->on(
-                'error',
-                function (ErrorEvent $event) use ($error, $internalRequest, $httpAdapterName) {
-                    $exception = new CannotFetchUri(
-                        $event->getException()->getRequest()->getUrl(),
-                        $httpAdapterName,
-                        $event->getException()
-                    );
-                    $exception->setRequest($internalRequest);
-                    call_user_func($error, $exception);
-                }
-            );
+        return $adapterException;
+    }
+
+    /**
+     * Builds options for Guzzle
+     *
+     * @param array $options
+     *
+     * @return array
+     */
+    private function buildOptions(array $options)
+    {
+        $guzzleOptions = [
+            'exceptions'      => false,
+            'allow_redirects' => false,
+        ];
+
+        if (isset($options['timeout'])) {
+            $guzzleOptions['connect_timeout'] = $options['timeout'];
+            $guzzleOptions['timeout'] = $options['timeout'];
         }
 
-        return $request;
+        return $guzzleOptions;
     }
 }
