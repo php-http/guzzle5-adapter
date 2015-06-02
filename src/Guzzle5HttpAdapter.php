@@ -17,8 +17,6 @@ use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Message\RequestInterface as GuzzleRequest;
 use GuzzleHttp\Message\ResponseInterface as GuzzleResponse;
 use GuzzleHttp\Pool;
-use Http\Adapter\Common\Exception\HttpAdapterException;
-use Http\Adapter\Common\Exception\MultiHttpAdapterException;
 use Http\Common\Message\MessageFactoryGuesser;
 use Http\Message\MessageFactory;
 use Http\Message\MessageFactoryAware;
@@ -94,7 +92,7 @@ class Guzzle5HttpAdapter implements HttpAdapter, MessageFactoryAware
         }
 
         if (count($exceptions) > 0) {
-            throw new MultiHttpAdapterException($exceptions, $responses);
+            throw new Exception\MultiHttpAdapterException($exceptions, $responses);
         }
 
         return $responses;
@@ -155,13 +153,13 @@ class Guzzle5HttpAdapter implements HttpAdapter, MessageFactoryAware
      *
      * @param RequestException $exception
      *
-     * @return HttpAdapterException
+     * @return Exception\HttpAdapterException
      */
     private function createException(
         RequestException $exception,
         RequestInterface $originalRequest
     ) {
-        $adapterException = new HttpAdapterException(
+        $adapterException = new Exception\HttpAdapterException(
             $exception->getMessage(),
             0,
             $exception
