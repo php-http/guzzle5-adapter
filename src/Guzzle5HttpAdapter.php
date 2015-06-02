@@ -17,24 +17,25 @@ use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Message\RequestInterface as GuzzleRequest;
 use GuzzleHttp\Message\ResponseInterface as GuzzleResponse;
 use GuzzleHttp\Pool;
-use Http\Common\Message\MessageFactoryGuesser;
+use Http\Message\MessageFactoryGuesser;
 use Http\Message\MessageFactory;
-use Http\Message\MessageFactoryAware;
-use Http\Message\MessageFactoryAwareTemplate;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 
 /**
  * @author GeLo <geloen.eric@gmail.com>
  */
-class Guzzle5HttpAdapter implements HttpAdapter, MessageFactoryAware
+class Guzzle5HttpAdapter implements HttpAdapter
 {
-    use MessageFactoryAwareTemplate;
-
     /**
      * @var ClientInterface
      */
     private $client;
+
+    /**
+     * @var MessageFactory
+     */
+    private $messageFactory;
 
     /**
      *
@@ -139,7 +140,7 @@ class Guzzle5HttpAdapter implements HttpAdapter, MessageFactoryAware
     {
         $body = $response->getBody();
 
-        return $this->getMessageFactory()->createResponse(
+        return $this->messageFactory->createResponse(
             $response->getStatusCode(),
             null,
             $response->getProtocolVersion(),
