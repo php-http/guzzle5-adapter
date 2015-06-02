@@ -17,7 +17,7 @@ use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Message\RequestInterface as GuzzleRequest;
 use GuzzleHttp\Message\ResponseInterface as GuzzleResponse;
 use GuzzleHttp\Pool;
-use Http\Message\MessageFactoryGuesser;
+use Http\Discovery\MessageFactoryDiscovery;
 use Http\Message\MessageFactory;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -45,7 +45,7 @@ class Guzzle5HttpAdapter implements HttpAdapter
     public function __construct(ClientInterface $client = null, MessageFactory $messageFactory = null)
     {
         $this->client = $client ?: new Client();
-        $this->messageFactory = $messageFactory ?: MessageFactoryGuesser::guess();
+        $this->messageFactory = $messageFactory ?: MessageFactoryDiscovery::find();
 
     }
 
