@@ -1,6 +1,6 @@
 {
     "name": "php-http/guzzle5-adapter",
-    "description": "Guzzle 5 HTTP adapter",
+    "description": "Guzzle 5 HTTP Adapter",
     "license": "MIT",
     "keywords": ["guzzle", "http"],
     "homepage": "http://php-http.org",

@@ -7,7 +7,7 @@
 [![Quality Score](https://img.shields.io/scrutinizer/g/php-http/guzzle5-adapter.svg?style=flat-square)](https://scrutinizer-ci.com/g/php-http/guzzle5-adapter)
 [![Total Downloads](https://img.shields.io/packagist/dt/php-http/guzzle5-adapter.svg?style=flat-square)](https://packagist.org/packages/php-http/guzzle5-adapter)
 
-**Guzzle 5 HTTP adapter.**
+**Guzzle 5 HTTP Adapter.**
 
 
 ## Install
