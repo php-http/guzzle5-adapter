@@ -1,31 +1,23 @@
 <?php
 
-/*
- * This file is part of the Http Adapter package.
- *
- * (c) Eric GELOEN <geloen.eric@gmail.com>
- *
- * For the full copyright and license information, please read the LICENSE
- * file that was distributed with this source code.
- */
-
 namespace Http\Adapter;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
-use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Message\RequestInterface as GuzzleRequest;
 use GuzzleHttp\Message\ResponseInterface as GuzzleResponse;
-use GuzzleHttp\Pool;
+use Http\Client\HttpClient;
 use Http\Discovery\MessageFactoryDiscovery;
 use Http\Message\MessageFactory;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
+use Http\Client\Exception as HttplugException;
+use GuzzleHttp\Exception as GuzzleExceptions;
 
 /**
  * @author GeLo <geloen.eric@gmail.com>
  */
-class Guzzle5HttpAdapter implements HttpAdapter
+class Guzzle5HttpAdapter implements HttpClient
 {
     /**
      * @var ClientInterface
@@ -38,7 +30,6 @@ class Guzzle5HttpAdapter implements HttpAdapter
     private $messageFactory;
 
     /**
-     *
      * @param ClientInterface|null $client
      * @param MessageFactory|null  $messageFactory
      */
@@ -46,81 +37,41 @@ class Guzzle5HttpAdapter implements HttpAdapter
     {
         $this->client = $client ?: new Client();
         $this->messageFactory = $messageFactory ?: MessageFactoryDiscovery::find();
-
     }
 
     /**
      * {@inheritdoc}
      */
-    public function sendRequest(RequestInterface $request, array $options = [])
+    public function sendRequest(RequestInterface $request)
     {
-        $guzzleRequest = $this->createRequest($request, $options);
+        $guzzleRequest = $this->createRequest($request);
 
         try {
             $response = $this->client->send($guzzleRequest);
-        } catch (RequestException $e) {
-            throw $this->createException($e, $request);
+        } catch (GuzzleExceptions\TransferException $e) {
+            throw $this->handleException($e, $request);
         }
 
         return $this->createResponse($response);
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function sendRequests(array $requests, array $options = [])
-    {
-        $requests = array_values($requests);
-        $guzzleRequests = [];
-
-        foreach ($requests as $request) {
-            $guzzleRequests[] = $this->createRequest($request, $options);
-        }
-
-        $results = Pool::batch($this->client, $guzzleRequests);
-
-        $exceptions = [];
-        $responses = [];
-
-        foreach ($guzzleRequests as $key => $guzzleRequest) {
-            $result = $results->getResult($guzzleRequest);
-
-            if ($result instanceof GuzzleResponse) {
-                $responses[] = $this->createResponse($result);
-            } elseif ($result instanceof RequestException) {
-                $exceptions[] = $this->createException($result, $requests[$key]);
-            }
-        }
-
-        if (count($exceptions) > 0) {
-            throw new Exception\MultiHttpAdapterException($exceptions, $responses);
-        }
-
-        return $responses;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return 'guzzle5';
-    }
-
-    /**
-     * Converts a PSR request into a Guzzle request
+     * Converts a PSR request into a Guzzle request.
      *
      * @param RequestInterface $request
      *
      * @return GuzzleRequest
      */
-    private function createRequest(RequestInterface $request, array $options = [])
+    private function createRequest(RequestInterface $request)
     {
-        $options = $this->buildOptions($options);
+        $options = [
+            'exceptions'      => false,
+            'allow_redirects' => false,
+        ];
 
         $options['version'] = $request->getProtocolVersion();
         $options['headers'] = $request->getHeaders();
-        $options['body']    = (string) $request->getBody();
+        $options['body'] = (string) $request->getBody();
 
         return $this->client->createRequest(
             $request->getMethod(),
@@ -130,7 +81,7 @@ class Guzzle5HttpAdapter implements HttpAdapter
     }
 
     /**
-     * Converts a Guzzle response into a PSR response
+     * Converts a Guzzle response into a PSR response.
      *
      * @param GuzzleResponse $response
      *
@@ -143,60 +94,41 @@ class Guzzle5HttpAdapter implements HttpAdapter
         return $this->messageFactory->createResponse(
             $response->getStatusCode(),
             null,
-            $response->getProtocolVersion(),
             $response->getHeaders(),
-            isset($body) ? $body->detach() : null
+            isset($body) ? $body->detach() : null,
+            $response->getProtocolVersion()
         );
     }
 
     /**
-     * Converts a Guzzle exception into an HttpAdapter exception
+     * Converts a Guzzle exception into an Httplug exception.
      *
-     * @param RequestException $exception
+     * @param GuzzleExceptions\TransferException $exception
+     * @param RequestInterface                   $request
      *
-     * @return Exception\HttpAdapterException
+     * @return HttplugException
      */
-    private function createException(
-        RequestException $exception,
-        RequestInterface $originalRequest
-    ) {
-        $adapterException = new Exception\HttpAdapterException(
-            $exception->getMessage(),
-            0,
-            $exception
-        );
-
-        $response = null;
-
-        if ($exception->hasResponse()) {
-            $response = $this->createResponse($exception->getResponse());
-        }
-
-        $adapterException->setResponse($response);
-        $adapterException->setRequest($originalRequest);
-
-        return $adapterException;
-    }
-
-    /**
-     * Builds options for Guzzle
-     *
-     * @param array $options
-     *
-     * @return array
-     */
-    private function buildOptions(array $options)
+    private function handleException(GuzzleExceptions\TransferException $exception, RequestInterface $request)
     {
-        $guzzleOptions = [
-            'exceptions'      => false,
-            'allow_redirects' => false,
-        ];
-
-        if (isset($options['timeout'])) {
-            $guzzleOptions['connect_timeout'] = $options['timeout'];
-            $guzzleOptions['timeout'] = $options['timeout'];
+        if ($exception instanceof GuzzleExceptions\ConnectException) {
+            return new HttplugException\NetworkException($exception->getMessage(), $request, $exception);
         }
 
-        return $guzzleOptions;
+        if ($exception instanceof GuzzleExceptions\RequestException) {
+            // Make sure we have a response for the HttpException
+            if ($exception->hasResponse()) {
+                $psr7Response = $this->createResponse($exception->getResponse());
+                return new HttplugException\HttpException(
+                    $exception->getMessage(),
+                    $request,
+                    $psr7Response,
+                    $exception
+                );
+            }
+
+            return new HttplugException\RequestException($exception->getMessage(), $request, $exception);
+        }
+
+        return new HttplugException\TransferException($exception->getMessage(), 0, $exception);
     }
 }

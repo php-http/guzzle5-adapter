@@ -13,17 +13,13 @@ namespace Http\Adapter\Tests;
 
 use GuzzleHttp\Client;
 use Http\Adapter\Guzzle5HttpAdapter;
+use Http\Client\Tests\HttpClientTest;
 
 /**
  * @author GeLo <geloen.eric@gmail.com>
  */
-abstract class Guzzle5HttpAdapterTest extends HttpAdapterTest
+abstract class Guzzle5HttpAdapterTest extends HttpClientTest
 {
-    public function testGetName()
-    {
-        $this->assertSame('guzzle5', $this->httpAdapter->getName());
-    }
-
     /**
      * {@inheritdoc}
      */
