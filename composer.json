@@ -17,13 +17,14 @@
     "require": {
         "php": ">=5.4",
         "php-http/httplug": "^1.0@dev",
-        "php-http/discovery": "^0.2",
+        "php-http/discovery": "^0.4",
         "guzzlehttp/guzzle": "^5.1"
     },
     "require-dev": {
         "ext-curl": "*",
         "guzzlehttp/ringphp": "^1.1",
-        "php-http/adapter-integration-tests": "dev-master"
+        "php-http/adapter-integration-tests": "dev-master",
+        "php-http/utils": "^0.2"
     },
     "provide": {
         "php-http/client-implementation": "1.0"
