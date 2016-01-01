@@ -16,6 +16,7 @@
     ],
     "require": {
         "php": ">=5.4",
+        "psr/http-message-implementation": "^1.0",
         "php-http/httplug": "^1.0.0-beta",
         "php-http/discovery": "~0.5",
         "guzzlehttp/guzzle": "^5.1"
@@ -23,6 +24,7 @@
     "require-dev": {
         "ext-curl": "*",
         "guzzlehttp/ringphp": "^1.1",
+        "guzzlehttp/psr7": "^1.0",
         "php-http/adapter-integration-tests": "dev-master",
         "php-http/client-common": "^0.1"
     },
