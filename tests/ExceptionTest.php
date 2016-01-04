@@ -1,18 +1,18 @@
 <?php
 
-namespace Http\Adapter\Tests;
+namespace Http\Adapter\Guzzle5\Tests;
 
 use GuzzleHttp\Exception as GuzzleExceptions;
 use GuzzleHttp\Message\Request as GuzzleRequest;
 use GuzzleHttp\Message\Response as GuzzleResponse;
 use GuzzleHttp\Psr7\Request as Psr7Request;
 use GuzzleHttp\Stream\Stream;
-use Http\Adapter\Guzzle5HttpAdapter;
+use Http\Adapter\Guzzle5\Client;
 
 /**
  * @author Tobias Nyholm <tobias.nyholm@gmail.com>
  */
-class Guzzle5ExceptionTest extends \PHPUnit_Framework_TestCase
+class ExceptionTest extends \PHPUnit_Framework_TestCase
 {
     private $guzzleRequest;
     private $guzzleResponse;
@@ -30,7 +30,7 @@ class Guzzle5ExceptionTest extends \PHPUnit_Framework_TestCase
         $client->expects($this->any())->method('createRequest')->willReturn($this->guzzleRequest);
 
         $request = new Psr7Request('GET', 'http://foo.com');
-        (new Guzzle5HttpAdapter($client))->sendRequest($request);
+        (new Client($client))->sendRequest($request);
     }
 
     public function testConnectException()

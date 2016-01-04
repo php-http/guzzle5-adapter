@@ -9,20 +9,22 @@
  * file that was distributed with this source code.
  */
 
-namespace Http\Adapter\Tests;
+namespace Http\Adapter\Guzzle5\Tests;
 
-use GuzzleHttp\Ring\Client\CurlMultiHandler;
+use GuzzleHttp\Ring\Client\CurlHandler;
 
 /**
+ * @requires PHP 5.5
+ *
  * @author GeLo <geloen.eric@gmail.com>
  */
-class Guzzle5MultiCurlHttpAdapterTest extends Guzzle5HttpAdapterTest
+class CurlHttpAdapterTest extends HttpAdapterTest
 {
     /**
      * {@inheritdoc}
      */
     protected function createHandler()
     {
-        return new CurlMultiHandler();
+        return new CurlHandler();
     }
 }

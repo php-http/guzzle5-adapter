@@ -24,7 +24,7 @@
         "ext-curl": "*",
         "guzzlehttp/ringphp": "^1.1",
         "php-http/adapter-integration-tests": "dev-master",
-        "php-http/client-common": "^0.1",
+        "php-http/client-common": "^0.1.1",
         "guzzlehttp/psr7": "^1.2"
     },
     "provide": {
@@ -32,12 +32,12 @@
     },
     "autoload": {
         "psr-4": {
-            "Http\\Adapter\\": "src/"
+            "Http\\Adapter\\Guzzle5\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Http\\Adapter\\Tests\\": "tests/"
+            "Http\\Adapter\\Guzzle5\\Tests\\": "tests/"
         }
     },
     "scripts": {

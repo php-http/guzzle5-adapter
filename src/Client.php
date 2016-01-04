@@ -1,8 +1,8 @@
 <?php
 
-namespace Http\Adapter;
+namespace Http\Adapter\Guzzle5;
 
-use GuzzleHttp\Client;
+use GuzzleHttp\Client as GuzzleClient;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Message\RequestInterface as GuzzleRequest;
 use GuzzleHttp\Message\ResponseInterface as GuzzleResponse;
@@ -18,7 +18,7 @@ use GuzzleHttp\Exception as GuzzleExceptions;
  * @author GeLo <geloen.eric@gmail.com>
  * @author Tobias Nyholm <tobias.nyholm@gmail.com>
  */
-class Guzzle5HttpAdapter implements HttpClient
+class Client implements HttpClient
 {
     /**
      * @var ClientInterface
@@ -36,7 +36,7 @@ class Guzzle5HttpAdapter implements HttpClient
      */
     public function __construct(ClientInterface $client = null, MessageFactory $messageFactory = null)
     {
-        $this->client = $client ?: new Client();
+        $this->client = $client ?: new GuzzleClient();
         $this->messageFactory = $messageFactory ?: MessageFactoryDiscovery::find();
     }
 
