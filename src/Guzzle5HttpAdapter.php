@@ -16,6 +16,7 @@ use GuzzleHttp\Exception as GuzzleExceptions;
 
 /**
  * @author GeLo <geloen.eric@gmail.com>
+ * @author Tobias Nyholm <tobias.nyholm@gmail.com>
  */
 class Guzzle5HttpAdapter implements HttpClient
 {
