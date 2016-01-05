@@ -9,23 +9,23 @@
  * file that was distributed with this source code.
  */
 
-namespace Http\Adapter\Tests;
+namespace Http\Adapter\Guzzle5\Tests;
 
-use GuzzleHttp\Client;
-use Http\Adapter\Guzzle5HttpAdapter;
+use GuzzleHttp\Client as GuzzleClient;
+use Http\Adapter\Guzzle5\Client;
 use Http\Client\Tests\HttpClientTest;
 
 /**
  * @author GeLo <geloen.eric@gmail.com>
  */
-abstract class Guzzle5HttpAdapterTest extends HttpClientTest
+abstract class HttpAdapterTest extends HttpClientTest
 {
     /**
      * {@inheritdoc}
      */
     protected function createHttpAdapter()
     {
-        return new Guzzle5HttpAdapter(new Client(['handler' => $this->createHandler()]));
+        return new Client(new GuzzleClient(['handler' => $this->createHandler()]));
     }
 
     /**

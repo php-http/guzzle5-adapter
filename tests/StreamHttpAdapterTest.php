@@ -9,14 +9,14 @@
  * file that was distributed with this source code.
  */
 
-namespace Http\Adapter\Tests;
+namespace Http\Adapter\Guzzle5\Tests;
 
 use GuzzleHttp\Ring\Client\StreamHandler;
 
 /**
  * @author GeLo <geloen.eric@gmail.com>
  */
-class Guzzle5StreamHttpAdapterTest extends Guzzle5HttpAdapterTest
+class StreamHttpAdapterTest extends HttpAdapterTest
 {
     /**
      * {@inheritdoc}
