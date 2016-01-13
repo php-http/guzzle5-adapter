@@ -66,7 +66,7 @@ class Client implements HttpClient
     private function createRequest(RequestInterface $request)
     {
         $options = [
-            'exceptions'      => false,
+            'exceptions' => false,
             'allow_redirects' => false,
         ];
 
@@ -119,6 +119,7 @@ class Client implements HttpClient
             // Make sure we have a response for the HttpException
             if ($exception->hasResponse()) {
                 $psr7Response = $this->createResponse($exception->getResponse());
+
                 return new HttplugException\HttpException(
                     $exception->getMessage(),
                     $request,
