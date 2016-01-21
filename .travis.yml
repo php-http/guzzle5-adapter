@@ -22,7 +22,7 @@ branches:
         - /^analysis-.*$/
 
 matrix:
-    allow_failure:
+    allow_failures:
         - php: hhvm
     fast_finish: true
     include:
