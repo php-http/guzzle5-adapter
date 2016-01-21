@@ -17,13 +17,13 @@
     "require": {
         "php": ">=5.4",
         "php-http/httplug": "^1.0",
-        "php-http/discovery": "~0.6.4",
+        "php-http/discovery": "^0.7",
         "guzzlehttp/guzzle": "^5.1"
     },
     "require-dev": {
         "ext-curl": "*",
+        "php-http/adapter-integration-tests": "^0.3",
         "guzzlehttp/ringphp": "^1.1",
-        "php-http/adapter-integration-tests": "^0.2",
         "php-http/client-common": "^0.1.1",
         "guzzlehttp/psr7": "^1.2"
     },
@@ -50,5 +50,5 @@
         }
     },
     "prefer-stable": true,
-    "minimum-stability": "dev"
+    "minimum-stability": "beta"
 }
