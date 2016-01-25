@@ -36,6 +36,10 @@ class Client implements HttpClient
      */
     public function __construct(ClientInterface $client = null, MessageFactory $messageFactory = null)
     {
+        if (null === $messageFactory and false === class_exists('Http\Discovery\MessageFactoryDiscovery')) {
+            throw new \LogicException('No message factory provided and no discovery service is present to guess it, maybe you need to install php-http/discovery package?');
+        }
+
         $this->client = $client ?: new GuzzleClient();
         $this->messageFactory = $messageFactory ?: MessageFactoryDiscovery::find();
     }
