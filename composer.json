@@ -17,7 +17,6 @@
     "require": {
         "php": ">=5.4",
         "php-http/httplug": "^1.0",
-        "php-http/discovery": "^0.7",
         "guzzlehttp/guzzle": "^5.1"
     },
     "require-dev": {
@@ -25,7 +24,11 @@
         "php-http/adapter-integration-tests": "^0.3",
         "guzzlehttp/ringphp": "^1.1",
         "php-http/client-common": "^0.1.1",
-        "guzzlehttp/psr7": "^1.2"
+        "guzzlehttp/psr7": "^1.2",
+        "php-http/discovery": "^0.7"
+    },
+    "suggest": {
+        "php-http/discovery": "Used for message factory discovery"
     },
     "provide": {
         "php-http/client-implementation": "1.0"

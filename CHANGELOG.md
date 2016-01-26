@@ -1,6 +1,13 @@
 # Change Log
 
 
+## UNRELEASED
+
+### Removed
+
+- Hard discovery dependency
+
+
 ## 0.3.0 - 2016-01-21
 
 ### Changed
