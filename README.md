@@ -1,4 +1,4 @@
-# Guzzle 5 Adapter
+# Guzzle 5 HTTP Adapter
 
 [![Latest Version](https://img.shields.io/github/release/php-http/guzzle5-adapter.svg?style=flat-square)](https://github.com/php-http/guzzle5-adapter/releases)
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE)
@@ -21,10 +21,18 @@ $ composer require php-http/guzzle5-adapter
 
 ## Documentation
 
-Please see the [official documentation](http://php-http.readthedocs.org/en/latest/).
+Please see the [official documentation](http://docs.php-http.org).
 
 
 ## Testing
+
+First launch the http server:
+
+```bash
+$ ./vendor/bin/http_test_server > /dev/null 2>&1 &
+```
+
+Then the test suite:
 
 ``` bash
 $ composer test
@@ -38,8 +46,7 @@ Please see our [contributing guide](http://docs.php-http.org/en/latest/developme
 
 ## Security
 
-If you discover any security related issues, please contact us at [security@httplug.io](mailto:security@httplug.io)
-or [security@php-http.org](mailto:security@php-http.org).
+If you discover any security related issues, please contact us at [security@php-http.org](mailto:security@php-http.org).
 
 
 ## License
