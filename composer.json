@@ -23,7 +23,7 @@
         "ext-curl": "*",
         "php-http/adapter-integration-tests": "^0.3",
         "guzzlehttp/ringphp": "^1.1",
-        "php-http/client-common": "^0.1.1",
+        "php-http/client-common": "^1.0",
         "guzzlehttp/psr7": "^1.2",
         "php-http/discovery": "^0.7"
     },
