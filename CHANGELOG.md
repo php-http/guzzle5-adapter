@@ -1,7 +1,11 @@
 # Change Log
 
 
-## UNRELEASED
+## 0.4.0 - 2016-01-27
+
+### Changed
+
+- Updated stable dependencies
 
 ### Removed
 

@@ -21,7 +21,7 @@ $ composer require php-http/guzzle5-adapter
 
 ## Documentation
 
-Please see the [official documentation](http://docs.php-http.org).
+Please see the [official documentation](http://docs.php-http.org/en/latest/clients/guzzle5-adapter.html).
 
 
 ## Testing
