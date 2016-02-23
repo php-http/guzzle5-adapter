@@ -17,7 +17,8 @@
     "require": {
         "php": ">=5.4",
         "php-http/httplug": "^1.0",
-        "guzzlehttp/guzzle": "^5.1"
+        "guzzlehttp/guzzle": "^5.1",
+        "php-http/discovery": "^0.8"
     },
     "require-dev": {
         "ext-curl": "*",
@@ -25,10 +26,7 @@
         "guzzlehttp/ringphp": "^1.1",
         "php-http/client-common": "^1.0",
         "guzzlehttp/psr7": "^1.2",
-        "php-http/discovery": "^0.7"
-    },
-    "suggest": {
-        "php-http/discovery": "Used for message factory discovery"
+        "puli/composer-plugin": "1.0.0-beta9"
     },
     "provide": {
         "php-http/client-implementation": "1.0"
@@ -49,7 +47,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "0.5-dev"
+            "dev-master": "0.6-dev"
         }
     },
     "prefer-stable": true,

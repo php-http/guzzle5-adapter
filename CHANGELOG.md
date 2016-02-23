@@ -1,6 +1,13 @@
 # Change Log
 
 
+## 0.5.0 - 2016-02-23
+
+### Added
+
+- Hard discovery dependency with Puli composer plugin suggested
+
+
 ## 0.4.0 - 2016-01-27
 
 ### Changed
