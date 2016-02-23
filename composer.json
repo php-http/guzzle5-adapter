@@ -28,9 +28,6 @@
         "guzzlehttp/psr7": "^1.2",
         "puli/composer-plugin": "1.0.0-beta9"
     },
-    "suggest": {
-        "puli/composer-plugin": "Used to set up Puli modules from composer packages"
-    },
     "provide": {
         "php-http/client-implementation": "1.0"
     },
