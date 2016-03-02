@@ -5,6 +5,7 @@ namespace Http\Adapter\Guzzle5\Tests;
 use GuzzleHttp\Client as GuzzleClient;
 use Http\Adapter\Guzzle5\Client;
 use Http\Client\Tests\HttpClientTest;
+use Http\Message\MessageFactory\GuzzleMessageFactory;
 
 /**
  * @author GeLo <geloen.eric@gmail.com>
@@ -16,7 +17,10 @@ abstract class HttpAdapterTest extends HttpClientTest
      */
     protected function createHttpAdapter()
     {
-        return new Client(new GuzzleClient(['handler' => $this->createHandler()]));
+        return new Client(
+            new GuzzleClient(['handler' => $this->createHandler()]),
+            new GuzzleMessageFactory()
+        );
     }
 
     /**
