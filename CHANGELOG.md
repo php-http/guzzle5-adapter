@@ -1,6 +1,13 @@
 # Change Log
 
 
+## 0.6.0 - 2016-06-27
+
+### Changed
+
+- Updated discovery dependency
+
+
 ## 0.5.0 - 2016-02-23
 
 ### Added
