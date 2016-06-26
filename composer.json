@@ -18,7 +18,7 @@
         "php": ">=5.4",
         "php-http/httplug": "^1.0",
         "guzzlehttp/guzzle": "^5.1",
-        "php-http/discovery": "^0.8"
+        "php-http/discovery": "^0.9"
     },
     "require-dev": {
         "ext-curl": "*",
