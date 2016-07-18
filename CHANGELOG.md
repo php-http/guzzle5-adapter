@@ -1,6 +1,13 @@
 # Change Log
 
 
+## UNRELEASED
+
+### Changed
+
+- Client now requires a Response factory instead of a Message factory
+
+
 ## 0.6.0 - 2016-06-27
 
 ### Changed
