@@ -21,7 +21,7 @@ class ExceptionTest extends \PHPUnit_Framework_TestCase
     public function setUp()
     {
         $this->guzzleRequest = new GuzzleRequest('GET', 'http://foo.com');
-        $this->guzzleResponse = new GuzzleResponse('400', [], Stream::factory('message body'), ['protocol_version'=>'1,1']);
+        $this->guzzleResponse = new GuzzleResponse('400', [], Stream::factory('message body'), ['protocol_version' => '1,1']);
     }
 
     protected function makeRequest(GuzzleExceptions\TransferException $exception)

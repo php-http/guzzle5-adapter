@@ -1,10 +1,12 @@
 # Change Log
 
 
-## UNRELEASED
+## 1.0.0 - 2016-07-18
 
 ### Changed
 
+- Improved package files
+- Discovery updated to ^1.0
 - Client now requires a Response factory instead of a Message factory
 
 
