@@ -1,6 +1,14 @@
 # Change Log
 
 
+## 1.0.0 - 2016-07-18
+
+### Changed
+
+- Improved package files
+- Discovery updated to ^1.0
+
+
 ## 0.6.0 - 2016-06-27
 
 ### Changed
