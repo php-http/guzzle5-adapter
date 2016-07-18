@@ -24,7 +24,7 @@ abstract class HttpAdapterTest extends HttpClientTest
     }
 
     /**
-     * Returns a handler for the client
+     * Returns a handler for the client.
      *
      * @return object
      */
