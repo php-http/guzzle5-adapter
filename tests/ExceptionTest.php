@@ -26,7 +26,7 @@ class ExceptionTest extends \PHPUnit_Framework_TestCase
 
     protected function makeRequest(GuzzleExceptions\TransferException $exception)
     {
-        $client = $this->getMock('GuzzleHttp\ClientInterface');
+        $client = $this->getMockBuilder('GuzzleHttp\ClientInterface')->getMock();
         $client->expects($this->any())->method('send')->willThrowException($exception);
         $client->expects($this->any())->method('createRequest')->willReturn($this->guzzleRequest);
 
