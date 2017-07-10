@@ -72,7 +72,8 @@ class Client implements HttpClient
 
         $options['version'] = $request->getProtocolVersion();
         $options['headers'] = $request->getHeaders();
-        $options['body'] = (string) $request->getBody();
+        $body = (string) $request->getBody();
+        $options['body'] = '' === $body ? null : $body;
 
         return $this->client->createRequest(
             $request->getMethod(),
