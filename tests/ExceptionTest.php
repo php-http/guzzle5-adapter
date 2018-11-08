@@ -16,6 +16,7 @@ use Http\Message\MessageFactory\GuzzleMessageFactory;
 class ExceptionTest extends \PHPUnit_Framework_TestCase
 {
     private $guzzleRequest;
+
     private $guzzleResponse;
 
     public function setUp()
