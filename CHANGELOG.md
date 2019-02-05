@@ -1,19 +1,14 @@
 # Change Log
 
-## [2.0.0] - 2019-02-02
+## 2.0.0 - 2019-02-05
 
 ### Added
 
 - Support for HTTPlug 2.0 and PSR-18
 
-### Changed
-
-- `\Http\Adapter\Guzzle5\Tests\ExceptionTest` extends `\PHPUnit\Framework\TestCase` instead of `PHPUnit_Framework_TestCase`
-
 ### Removed
 
 - Support for PHP <7.0
-- Support for PHPUnit <6.0
 
 ## 1.0.1 - 2017-07-11
 
