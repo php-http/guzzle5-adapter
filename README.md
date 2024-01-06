@@ -9,6 +9,13 @@
 
 **Guzzle 5 HTTP Adapter.**
 
+# Deprecated
+
+This adapter only implements the PHP-HTTP synchronous interface. This interface
+has been superseded by PSR-18.
+
+Guzzle 5 is very old and not maintained anymore. We recommend to upgrade to
+Guzzle version 7 which implements PSR-18 natively.
 
 ## Install
 
